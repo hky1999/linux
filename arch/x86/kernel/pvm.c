@@ -13,18 +13,22 @@
 #include <linux/mm_types.h>
 #include <linux/nospec.h>
 
+#include <asm/cmdline.h>
 #include <asm/cpufeature.h>
 #include <asm/cpu_entry_area.h>
 #include <asm/desc.h>
 #include <asm/pvm_para.h>
 #include <asm/setup.h>
 #include <asm/traps.h>
+#include <asm/tsc.h>
 
 DEFINE_PER_CPU_PAGE_ALIGNED(struct pvm_vcpu_struct, pvm_vcpu_struct);
 static DEFINE_PER_CPU(unsigned long, pvm_guest_cr3);
 
 unsigned long pvm_range_start __initdata;
 unsigned long pvm_range_end __initdata;
+
+bool pvm_tsc_strict __ro_after_init;
 
 static bool early_traps_setup __initdata;
 
@@ -465,6 +469,39 @@ static void __init pvm_early_patch(void)
 
 extern void pvm_early_kernel_event_entry(void);
 
+static void __init pvm_setup_tsc_mode(void)
+{
+#ifdef CONFIG_CMDLINE_OVERRIDE
+	const char *cmdline = builtin_cmdline;
+#else
+	const char *cmdline = boot_command_line;
+#endif
+	char mode[8];
+	int len;
+
+	len = cmdline_find_option(cmdline, "pvm_tsc", mode, sizeof(mode));
+#if defined(CONFIG_CMDLINE_BOOL) && !defined(CONFIG_CMDLINE_OVERRIDE)
+	/* setup_arch() has not yet prepended the built-in command line. */
+	if (len < 0)
+		len = cmdline_find_option(builtin_cmdline, "pvm_tsc", mode,
+					  sizeof(mode));
+#endif
+	if (len == 6 && !strcmp(mode, "unsafe")) {
+		pr_info("TSC mode: unsafe\n");
+		return;
+	}
+
+	if (len >= 0 && (len != 6 || strcmp(mode, "strict")))
+		pr_warn("Unknown pvm_tsc mode, using strict\n");
+
+	pvm_tsc_strict = true;
+
+	setup_clear_cpu_cap(X86_FEATURE_TSC_DEADLINE_TIMER);
+	setup_clear_cpu_cap(X86_FEATURE_TSC_ADJUST);
+	mark_tsc_unstable("PVM strict TSC mode");
+	pr_info("TSC mode: strict\n");
+}
+
 void __init pvm_early_setup(void)
 {
 	if (!pvm_range_end)
@@ -472,6 +509,7 @@ void __init pvm_early_setup(void)
 
 	setup_force_cpu_cap(X86_FEATURE_KVM_PVM_GUEST);
 	setup_force_cpu_cap(X86_FEATURE_PV_GUEST);
+	pvm_setup_tsc_mode();
 
 	/* Don't use SYSENTER (Intel) and SYSCALL32 (AMD) in vdso. */
 	setup_clear_cpu_cap(X86_FEATURE_SYSENTER32);

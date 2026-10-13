@@ -17,6 +17,13 @@ void __init pvm_setup_early_traps(void);
 void pvm_setup_event_handling(void);
 bool __init pvm_kernel_layout_relocate(void);
 
+extern bool pvm_tsc_strict;
+
+static inline bool pvm_tsc_strict_mode(void)
+{
+	return pvm_tsc_strict;
+}
+
 static inline void pvm_cpuid(unsigned int *eax, unsigned int *ebx,
 			     unsigned int *ecx, unsigned int *edx)
 {
@@ -64,6 +71,11 @@ static inline bool pvm_detect(void)
 	return true;
 }
 #else
+static inline bool pvm_tsc_strict_mode(void)
+{
+	return false;
+}
+
 static inline void pvm_early_setup(void)
 {
 }

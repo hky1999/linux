@@ -4898,6 +4898,16 @@
 
 	prompt_ramdisk=	[RAM] [Deprecated]
 
+	pvm_tsc=	[X86,PVM,EARLY] PVM guest TSC mode.
+			Format: {strict | unsafe}
+			strict (default): mark TSC unstable so kvmclock is
+			preferred as the clocksource, disable TSC deadline
+			timer, and hide TSC_ADJUST. The local APIC timer uses
+			one-shot mode instead. Direct RDTSC/RDTSCP reads still
+			return the host TSC and may jump across restore.
+			unsafe: retain the normal TSC clocksource and timer
+			selection; snapshot/restore may expose TSC rollback.
+
 	prot_virt=	[S390] enable hosting protected virtual machines
 			isolated from the hypervisor (if hardware supports
 			that). If enabled, the default kernel base address
