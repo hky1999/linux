@@ -52,6 +52,7 @@
 #include <asm/pci-direct.h>
 #include <asm/prom.h>
 #include <asm/proto.h>
+#include <asm/pvm_para.h>
 #include <asm/thermal.h>
 #include <asm/unwind.h>
 #include <asm/vsyscall.h>
@@ -777,6 +778,9 @@ void __init setup_arch(char **cmdline_p)
 
 	strscpy(command_line, boot_command_line, COMMAND_LINE_SIZE);
 	*cmdline_p = command_line;
+
+	/* Select the PVM clock policy before hypervisor and TSC initialization. */
+	pvm_setup_tsc_mode();
 
 	/*
 	 * If we have OLPC OFW, we might end up relocating the fixmap due to

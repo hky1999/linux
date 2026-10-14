@@ -4907,6 +4907,9 @@
 			return the host TSC and may jump across restore.
 			unsafe: retain the normal TSC clocksource and timer
 			selection; snapshot/restore may expose TSC rollback.
+			The effective command line follows CONFIG_CMDLINE's
+			append/override policy; the last occurrence wins.
+			Unknown or empty values select strict mode.
 
 	prot_virt=	[S390] enable hosting protected virtual machines
 			isolated from the hypervisor (if hardware supports

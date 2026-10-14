@@ -13,6 +13,7 @@
 
 void pvm_relocate_kernel(struct boot_params *bp);
 void __init pvm_early_setup(void);
+void __init pvm_setup_tsc_mode(void);
 void __init pvm_setup_early_traps(void);
 void pvm_setup_event_handling(void);
 bool __init pvm_kernel_layout_relocate(void);
@@ -77,6 +78,10 @@ static inline bool pvm_tsc_strict_mode(void)
 }
 
 static inline void pvm_early_setup(void)
+{
+}
+
+static inline void pvm_setup_tsc_mode(void)
 {
 }
 

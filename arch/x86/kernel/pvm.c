@@ -469,23 +469,17 @@ static void __init pvm_early_patch(void)
 
 extern void pvm_early_kernel_event_entry(void);
 
-static void __init pvm_setup_tsc_mode(void)
+void __init pvm_setup_tsc_mode(void)
 {
-#ifdef CONFIG_CMDLINE_OVERRIDE
-	const char *cmdline = builtin_cmdline;
-#else
-	const char *cmdline = boot_command_line;
-#endif
 	char mode[8];
 	int len;
 
-	len = cmdline_find_option(cmdline, "pvm_tsc", mode, sizeof(mode));
-#if defined(CONFIG_CMDLINE_BOOL) && !defined(CONFIG_CMDLINE_OVERRIDE)
-	/* setup_arch() has not yet prepended the built-in command line. */
-	if (len < 0)
-		len = cmdline_find_option(builtin_cmdline, "pvm_tsc", mode,
-					  sizeof(mode));
-#endif
+	if (!boot_cpu_has(X86_FEATURE_KVM_PVM_GUEST))
+		return;
+
+	/* setup_arch() has applied built-in command-line policy at this point. */
+	len = cmdline_find_option(boot_command_line, "pvm_tsc", mode,
+				  sizeof(mode));
 	if (len == 6 && !strcmp(mode, "unsafe")) {
 		pr_info("TSC mode: unsafe\n");
 		return;
@@ -509,7 +503,6 @@ void __init pvm_early_setup(void)
 
 	setup_force_cpu_cap(X86_FEATURE_KVM_PVM_GUEST);
 	setup_force_cpu_cap(X86_FEATURE_PV_GUEST);
-	pvm_setup_tsc_mode();
 
 	/* Don't use SYSENTER (Intel) and SYSCALL32 (AMD) in vdso. */
 	setup_clear_cpu_cap(X86_FEATURE_SYSENTER32);
