@@ -76,3 +76,15 @@ review and qualification. Other ABIs (including ``7.0.0-31-generic``), AMD,
 Secure Boot policies, suspend/resume and heterogeneous migration require their
 own evidence. Prior qualification of a different commit cannot qualify a new
 profile automatically.
+PKRU host enablement
+--------------------
+
+The pinned Ubuntu profile includes the upstream OSPKE guard fix from
+``virt-pvm/linux`` commit ``f157a4af83471636664d26457b048cf63ead7c43``.
+Both PKRU switching wrappers and the temporary guest-PKU capability override
+require host OSPKE, rather than the hardware PKU bit. A PKU-capable host
+booted with ``nopku`` can therefore avoid executing RDPKRU with CR4.PKE clear.
+This host-module fix does not implement complete guest protection-key
+semantics or change guest TSC behavior. Requalify the matched pair after
+updating a baseline or target profile; do not apply the optional DEBUGCTL
+optimization as part of this fix.

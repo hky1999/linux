@@ -3,7 +3,7 @@
   "name": "ubuntu-7.0.0-30-generic",
   "source": {
     "repository": "https://github.com/hky1999/linux.git",
-    "commit": "d7518a5b7016186cce5f3f1951efb4ce347e6dc1",
+    "commit": "b390d49281cf80fe3d6938528c49d4f632e71ecf",
     "upstream_base": "71b35309f8698bb664dbed0028156c82b8ec79b8",
     "export_roots": [
       "arch/x86/kvm",
@@ -12,7 +12,7 @@
       "virt/kvm",
       "Documentation/virt/kvm/pvm-oot.rst"
     ],
-    "export_tree_sha256": "f17af748e4444411ae97c00c0554c055738a6a5a156b295d4c2f0a0c3b1c2f6f"
+    "export_tree_sha256": "ba2d7511f78c862856aaeee6c875ea8d01aae76aedd15529e8a6578f6d992c49"
   },
   "patches": [
     {
