@@ -88,3 +88,13 @@ This host-module fix does not implement complete guest protection-key
 semantics or change guest TSC behavior. Requalify the matched pair after
 updating a baseline or target profile; do not apply the optional DEBUGCTL
 optimization as part of this fix.
+
+NX recovery worker retry
+------------------------
+
+The baseline also backports upstream commit
+``916b7f42b3b3b539a71c204a9b49fdc4ca92cd82``. A non-fatal signal during
+first ``KVM_RUN`` can interrupt recovery-worker creation. The once helper
+now preserves that error and retries initialization on the next run instead
+of converting it to permanent ``-ENOMEM``. This is a generic 6.12 KVM core
+fix, independent of the target adaptation and the optional DEBUGCTL patch.
