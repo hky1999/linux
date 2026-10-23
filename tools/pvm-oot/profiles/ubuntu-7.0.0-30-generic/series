@@ -3,3 +3,4 @@
 0003-KVM-adapt-syscore-registration-to-the-target-API.patch
 0004-KVM-pass-the-eventfd-to-target-IRQ-bypass-registrati.patch
 0005-KVM-PVM-bridge-target-core-only-exports-to-the-OOT-b.patch
+0006-KVM-use-the-target-PIT-worker-run-API.patch

@@ -45,13 +45,21 @@ constraints. Keep guest source and guest bundle pins separate.
 Patch responsibilities
 ----------------------
 
-The five patches cover host headers/configuration, timer setup, syscore
-registration, IRQ-bypass registration, and module export bridges. Timer,
+The six patches cover host headers/configuration, timer setup, syscore
+registration, IRQ-bypass registration, module export bridges, and PIT
+worker startup. Timer,
 syscore and IRQ-bypass adaptations are confined to baseline adapter boundaries.
 Backend calls use explicit bridge names. One scoped FRED header redirect is
 needed for calls inside host inline helpers; it applies only to backend objects
 and does not affect the bridge's own host call. The IBPB feature condition and
 ``noinstr`` guest-transition requirements are retained.
+
+The PIT adaptation uses the target's ``kthread_run_worker()`` API to retain
+6.12's eager-start behavior. The newer ``kthread_create_worker()`` leaves a
+worker in its initialization state until work is first queued. Queueing and
+normal destruction can wake it, but an unused PIT worker can otherwise emit
+a hung-task INFO report. Target qualification must check idle creation, work
+dispatch and destruction in addition to the module ABI and exported symbols.
 
 These are interface-oriented patches selected by a target profile. A future
 profile may reuse them after reviewing that target's actual APIs, configuration

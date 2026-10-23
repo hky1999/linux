@@ -34,6 +34,10 @@
     {
       "file": "0005-KVM-PVM-bridge-target-core-only-exports-to-the-OOT-b.patch",
       "sha256": "bd51f26f23be2a22f6618295a7c2c7d5de5570c25c7acdd33fa3b6335962f14c"
+    },
+    {
+      "file": "0006-KVM-use-the-target-PIT-worker-run-API.patch",
+      "sha256": "c474a5872b47541e4615c35d07244d0fafe503f7303d864e8921e88658a0252b"
     }
   ],
   "target": {

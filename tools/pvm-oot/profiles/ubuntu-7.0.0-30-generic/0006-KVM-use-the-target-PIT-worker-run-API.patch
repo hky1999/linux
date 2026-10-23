@@ -1,0 +1,33 @@
+From: 月可 <hukeyang.hky@antgroup.com>
+Subject: [PATCH 6/6] KVM: retain eager PIT worker startup on Ubuntu 7.0
+
+The 6.12 kthread_create_worker() API also starts its worker. The target
+kernel separates creation from startup, following upstream b04e317b5226
+("treewide: Introduce kthread_run_worker[_on_cpu]()").
+
+Use the target run helper to preserve the baseline's eager startup. A
+worker with no initial PIT work must not remain in its initialization
+TASK_UNINTERRUPTIBLE state and produce a misleading hung-task report.
+Queueing work and normal destruction can wake that state; this change
+does not claim to fix a permanent PIT deadlock.
+
+Keep this API adaptation in the target patch series so the native 6.12
+baseline does not require the newer helper.
+
+Signed-off-by: 月可 <hukeyang.hky@antgroup.com>
+---
+ arch/x86/kvm/i8254.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+--- a/arch/x86/kvm/i8254.c
++++ b/arch/x86/kvm/i8254.c
+@@ -682,7 +682,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
+ 	pid_nr = pid_vnr(pid);
+ 	put_pid(pid);
+ 
+-	pit->worker = kthread_create_worker(0, "kvm-pit/%d", pid_nr);
++	pit->worker = kthread_run_worker(0, "kvm-pit/%d", pid_nr);
+ 	if (IS_ERR(pit->worker))
+ 		goto fail_kthread;
+ 
